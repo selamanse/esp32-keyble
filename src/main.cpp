@@ -238,6 +238,7 @@ void SetWifi(bool active)
 // ---[SetupWiFi]---------------------------------------------------------------
 void SetupWifi()
 {
+  WiFi.hostname("esp32-keyble-bridge");
   WiFi.begin(ssid.c_str(), password.c_str());
   if (WiFi.status() == WL_CONNECTED)
   {
