@@ -19,6 +19,10 @@ int rssi = 0;
 int greenLED = 33;
 int redLED = 32;
 
+char strArrayCmdTerminator[] = "\r\n";
+char* unsignedCharCmdTerminator = strArrayCmdTerminator;
+char COMMAND_TEMRINATOR = *unsignedCharCmdTerminator;
+
 // ---[LED Stuff]------------------------------------------------------------
 void initLED(){
   pinMode(greenLED, OUTPUT);
@@ -66,13 +70,9 @@ void setup()
 void loop()
 {
   if (Serial.available()) {
-    char str1[] = "\r\n";
-    char* cp = str1;
-    char c = *cp;
-    data = Serial.readStringUntil(c);
+    data = Serial.readStringUntil(COMMAND_TEMRINATOR);
     data.trim();
     Serial.println("received: " + data);
-    
 
     Serial.println("*** check command ***");
     if (data == "open") {
