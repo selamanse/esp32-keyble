@@ -65,8 +65,7 @@ void setup()
 // ---[loop]--------------------------------------------------------------------
 void loop()
 {
-  // Serial.println("connection state: " + keyble->state.connectionState);
-  if (desiredLockState == UNKNOWN && Serial.available()) {
+  if (Serial.available()) {
     char str1[] = "\r\n";
     char* cp = str1;
     char c = *cp;
@@ -102,15 +101,5 @@ void loop()
     }
   }
 
-  bool timeout = (millis() - starttime > LOCK_TIMEOUT * 2000 + 1000);
-
-  if (desiredLockState == keyble->_LockStatus || timeout)
-  {
-    Serial.println("# Lockstatus is: " + keyble->_LockStatus);
-    delay(100);
-    yield();
-    greenLEDOn(100);
-    desiredLockState = UNKNOWN;
-  }
-
+  // bool timeout = (millis() - starttime > LOCK_TIMEOUT * 2000 + 1000);
 }
