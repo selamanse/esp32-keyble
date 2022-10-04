@@ -85,6 +85,7 @@ modules.xml
 
 ### PlatformIO ###
 .pio/build
+.pio/libdeps
 .pioenvs
 .piolibdeps
 .clang_complete
