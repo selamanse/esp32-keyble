@@ -5,6 +5,7 @@
 #include "eQ3_constants.h"
 #include <BLEDevice.h>
 #include "secrets.h"
+#include <HardwareSerial.h>
 
 // ---[Variables]---------------------------------------------------------------
 eQ3 *keyble;
@@ -22,6 +23,9 @@ int redLED = 32;
 char strArrayCmdTerminator[] = "\r\n";
 char* unsignedCharCmdTerminator = strArrayCmdTerminator;
 char COMMAND_TEMRINATOR = *unsignedCharCmdTerminator;
+
+// ---[UART Serial]---------------------------------------------------------------
+HardwareSerial esphomeUART(2);  //using UART2
 
 // ---[LED Stuff]------------------------------------------------------------
 void initLED(){
@@ -56,50 +60,61 @@ void setup()
   redLEDOn(0);
   delay(1000);
   Serial.begin(115200);
-  Serial.println("---Starting up...---");
+  Serial.println("--- Starting up ---");
   Serial.setDebugOutput(true);
+
+  //UART
+  esphomeUART.begin(9600, SERIAL_8N1, 16, 17);
+  Serial.println("--- UART 1 Serial started ---");
 
   greenLEDOn(500);
 
   //Bluetooth
   BLEDevice::init("");
   keyble = new eQ3(KeyBleMac, KeyBleUserKey, KeyBleUserId);
+  keyble->connect();
+  while(keyble->state.connectionState != CONNECTED){
+    Serial.println("--- Connecting to KeyBle ---");
+    delay(1000);
+  }
+
+  Serial.println("Connected to KeyBle");
   keyble->updateInfo();
+  Serial.println("--- Startup finished ---");
+  
 }
 // ---[loop]--------------------------------------------------------------------
 void loop()
 {
-  if (Serial.available()) {
-    data = Serial.readStringUntil(COMMAND_TEMRINATOR);
+  if (esphomeUART.available()) {
+    data = esphomeUART.readStringUntil(COMMAND_TEMRINATOR);
     data.trim();
     Serial.println("received: " + data);
 
-    Serial.println("*** check command ***");
+    Serial.println("--- check command ---");
     if (data == "open") {
       desiredLockState = OPENED;
       starttime = millis();
-      Serial.println("*** open ***");
+      Serial.println("--- open ---");
       keyble->open();
     } else if (data == "lock")
     {
       desiredLockState = LOCKED;
       starttime = millis();
-      Serial.println("*** lock ***");
+      Serial.println("--- lock ---");
       keyble->lock();
     } else if (data == "unlock")
     {
       desiredLockState = UNLOCKED;
       starttime = millis();
-      Serial.println("*** unlock ***");
+      Serial.println("--- unlock ---");
       keyble->unlock();
     } else if (data == "status")
     {
       desiredLockState = UNKNOWN;
       starttime = millis();
-      Serial.println("*** status ***");
+      Serial.println("--- status ---");
       keyble->updateInfo();
     }
   }
-
-  // bool timeout = (millis() - starttime > LOCK_TIMEOUT * 2000 + 1000);
 }
