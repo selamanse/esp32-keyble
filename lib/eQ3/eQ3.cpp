@@ -170,7 +170,7 @@ void eQ3::connect() {
 // --[sendMessage]--------------------------------------------------------------
 // -----------------------------------------------------------------------------
 bool eQ3::sendMessage(eQ3Message::Message *msg) {
-    Serial.println("# enter sendMessage");;
+    // Serial.println("# enter sendMessage");;
     std::string data;
     if (msg->isSecure()) {
         if (state.connectionState < NONCES_EXCHANGED) {
@@ -219,7 +219,7 @@ bool eQ3::sendMessage(eQ3Message::Message *msg) {
             frag.data.append(16 - (frag.data.length() % 16), 0);  // padding
         sendQueue.push(frag);
     }
-    Serial.println("# exit sendMessage");;
+    // Serial.println("# exit sendMessage");;
     free(msg);
     return true;
 }
@@ -333,11 +333,11 @@ void eQ3::onNotify(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* p
                 // status info
                 eQ3Message::Status_Info_Message message;
                 message.data = msgdata;
-                Serial.print("# New state: ");
-                Serial.println(message.getLockStatus());
+                // Serial.print("# New state: ");
+                // Serial.println(message.getLockStatus());
                 _LockStatus = message.getLockStatus();
                 raw_data = message.data;
-                //onStatusChange((LockStatus)message.getLockStatus()); // BUG: löst einen Reset aus!!
+                onStatusChange((LockStatus)message.getLockStatus());
                 break;
             }
 
