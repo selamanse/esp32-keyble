@@ -1,0 +1,54 @@
+esphome:
+  includes:
+    - uart_lock.h
+
+logger:
+  level: VERBOSE #makes uart stream available in esphome logstream
+  baud_rate: 0 #disable logging over uart
+
+uart:
+  id: uart_bus
+  tx_pin: GPIO2
+  rx_pin: GPIO4
+  baud_rate: 9600
+  debug:
+    direction: BOTH
+    dummy_receiver: false
+    after:
+      delimiter: "\r"
+    sequence:
+      - lambda: |-
+          UARTDebug::log_string(direction, bytes);
+
+text_sensor:
+  - platform: custom
+    lambda: |-
+      auto my_custom_sensor = new UartReadLineSensor(id(uart_bus));
+      App.register_component(my_custom_sensor);
+      return {my_custom_sensor};
+    text_sensors:
+      id: "uart_readline"
+
+lock:
+  - platform: template
+    id: uart_lock_dev
+    name: UART Lock DEV
+    lambda: |-
+      auto lock_state = id(uart_readline).state;
+      if(lock_state == "3")
+        return LOCK_STATE_LOCKED;
+      else if(lock_state == "2")
+        return LOCK_STATE_UNLOCKED;
+      else if(lock_state == "1")
+        return LOCK_STATE_UNLOCKING;
+      else
+        return LOCK_STATE_NONE;
+    optimistic: true
+    assumed_state: false
+    unlock_action:      
+      - uart.write: "unlock\r\n"
+    lock_action:
+      - uart.write: "lock\r\n"
+    open_action:
+      - uart.write: "open\r\n"
+
