@@ -36,8 +36,6 @@ HardwareSerial esphomeUART(2);  //using UART2
 void setup()
 {
   pinMode(ONBOARD_LED, OUTPUT);
-  digitalWrite(ONBOARD_LED,HIGH);
-
   Serial.begin(115200);
   Serial.println("--- Starting up ---");
   Serial.setDebugOutput(true);
@@ -66,8 +64,6 @@ void setup()
   Serial.println("Connected to KeyBle");
   keyble->updateInfo();
   Serial.println("--- Startup finished ---");
-  digitalWrite(ONBOARD_LED,LOW);
-  
 }
 // ---[loop]--------------------------------------------------------------------
 void loop()
