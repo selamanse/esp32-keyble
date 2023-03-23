@@ -7,6 +7,10 @@
 #include "secrets.h"
 #include <HardwareSerial.h>
 
+// ---[Constants]---------------------------------------------------------------
+#define ONBOARD_LED  2
+
+
 // ---[Variables]---------------------------------------------------------------
 eQ3 *keyble;
 
@@ -17,6 +21,7 @@ LockStatus desiredLockState = UNKNOWN;
 unsigned long lastrun = 0;
 int status = 0;
 int rssi = 0;
+
 int greenLED = 33;
 int redLED = 32;
 
@@ -27,38 +32,12 @@ char COMMAND_TEMRINATOR = *unsignedCharCmdTerminator;
 // ---[UART Serial]---------------------------------------------------------------
 HardwareSerial esphomeUART(2);  //using UART2
 
-// ---[LED Stuff]------------------------------------------------------------
-void initLED(){
-  pinMode(greenLED, OUTPUT);
-  pinMode(redLED, OUTPUT);
-}
-void allLEDOff(){
-  digitalWrite(redLED, LOW);
-  digitalWrite(greenLED, LOW);
-}
-void redLEDOn(int duration){
-  digitalWrite(greenLED, LOW);
-  digitalWrite(redLED, HIGH);
-  if(duration > 0){
-    delay(duration);
-    allLEDOff();
-  }
-}
-void greenLEDOn(int duration){
-  digitalWrite(redLED, LOW);
-  digitalWrite(greenLED, HIGH);
-  if(duration > 0){
-    delay(duration);
-    allLEDOff();
-  }
-}
-
 // ---[Setup]-------------------------------------------------------------------
 void setup()
 {
-  initLED();
-  redLEDOn(0);
-  delay(1000);
+  pinMode(ONBOARD_LED, OUTPUT);
+  digitalWrite(ONBOARD_LED,HIGH);
+
   Serial.begin(115200);
   Serial.println("--- Starting up ---");
   Serial.setDebugOutput(true);
@@ -66,8 +45,7 @@ void setup()
   //UART
   esphomeUART.begin(9600, SERIAL_8N1, 16, 17);
   Serial.println("--- UART 1 Serial started ---");
-
-  greenLEDOn(500);
+  esphomeUART.println(String(UNKNOWN)); // send initial lockstatus as unknown after (re-)boot
 
   //Bluetooth
   BLEDevice::init("");
@@ -88,6 +66,7 @@ void setup()
   Serial.println("Connected to KeyBle");
   keyble->updateInfo();
   Serial.println("--- Startup finished ---");
+  digitalWrite(ONBOARD_LED,LOW);
   
 }
 // ---[loop]--------------------------------------------------------------------
