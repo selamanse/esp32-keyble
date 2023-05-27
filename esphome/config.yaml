@@ -1,6 +1,6 @@
 esphome:
   includes:
-    - uart_lock.h
+    - uart_read_line_sensor.h
 
 logger:
   level: VERBOSE #makes uart stream available in esphome logstream
